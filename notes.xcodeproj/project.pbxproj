@@ -6,6 +6,10 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		0099A9002F43C509002E8594 /* KeychainAccess in Frameworks */ = {isa = PBXBuildFile; productRef = 0099A8FF2F43C509002E8594 /* KeychainAccess */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		0099A8642F43BF6E002E8594 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -52,6 +56,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				0099A9002F43C509002E8594 /* KeychainAccess in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -112,6 +117,7 @@
 			);
 			name = notes;
 			packageProductDependencies = (
+				0099A8FF2F43C509002E8594 /* KeychainAccess */,
 			);
 			productName = notes;
 			productReference = 0099A8562F43BF6A002E8594 /* notes.app */;
@@ -195,6 +201,9 @@
 			);
 			mainGroup = 0099A84D2F43BF6A002E8594;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				0099A8FE2F43C509002E8594 /* XCRemoteSwiftPackageReference "KeychainAccess" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 0099A8572F43BF6A002E8594 /* Products */;
 			projectDirPath = "";
@@ -578,6 +587,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		0099A8FE2F43C509002E8594 /* XCRemoteSwiftPackageReference "KeychainAccess" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/kishikawakatsumi/KeychainAccess.git";
+			requirement = {
+				branch = master;
+				kind = branch;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		0099A8FF2F43C509002E8594 /* KeychainAccess */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 0099A8FE2F43C509002E8594 /* XCRemoteSwiftPackageReference "KeychainAccess" */;
+			productName = KeychainAccess;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 0099A84E2F43BF6A002E8594 /* Project object */;
 }

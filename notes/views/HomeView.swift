@@ -15,92 +15,100 @@ struct HomeView: View {
     @State private var showCreateNotebook: Bool = false
     
     var body: some View {
-        VStack(spacing: 0) {
-            
-            // MARK: - Top Bar
-            HStack {
+        NavigationStack {
+            VStack(spacing: 0) {
                 
-                Button(action: {}) {
-                    Image(systemName: "line.3.horizontal")
-                        .font(.title2)
-                        .foregroundStyle(.primary)
-                }
-                .buttonStyle(.plain)
-                
-                Spacer()
-                
-                Button(action: {
-                    lightHaptic()
-                    showCreateNotebook = true
-                }) {
-                    Text("+ New")
-                        .font(.subheadline)
-                        .fontWeight(.semibold)
-                        .foregroundStyle(.primary)
-                        .padding(.horizontal, 14)
-                        .padding(.vertical, 8)
-                        .background(Color.blue)
-                        .clipShape(RoundedRectangle(cornerRadius: 10))
-                }
-                .buttonStyle(.plain)
-            }
-            .padding(.horizontal)
-            .padding(.top, 12)
-            .padding(.bottom, 8)
-            .background(Color(.systemBackground))
-            
-            // MARK: - Content
-            VStack(alignment: .leading, spacing: 16) {
-                
-                Text("Notebooks")
-                    .font(.largeTitle)
-                    .bold()
-                    .padding(.top)
-                
-                if isLoading {
-                    ProgressView()
-                        .padding(.top, 20)
-                }
-                else if notebooks.isEmpty {
-                    Text("No notebooks created yet.")
-                        .foregroundStyle(.secondary)
-                        .padding(.top, 20)
-                }
-                else {
-                    ForEach(notebooks) { notebook in
-                        HStack(spacing: 12) {
-                            
-                            Image(systemName: "text.book.closed")
-                                .font(.system(size: 22))
-                                .foregroundStyle(colorForNotebook(notebook))
-                            
-                            Text(notebook.title)
-                                .font(.system(size: 18, weight: .semibold))
-
-                            Spacer()
-                        }
-                        .padding(.vertical, 6)
+                HStack {
+                    
+                    Button(action: {}) {
+                        Image(systemName: "line.3.horizontal")
+                            .font(.title2)
+                            .foregroundStyle(.primary)
                     }
+                    .buttonStyle(.plain)
+                    
+                    Spacer()
+                    
+                    Button(action: {
+                        lightHaptic()
+                        showCreateNotebook = true
+                    }) {
+                        Text("+ New")
+                            .font(.subheadline)
+                            .fontWeight(.semibold)
+                            .foregroundStyle(.primary)
+                            .padding(.horizontal, 14)
+                            .padding(.vertical, 8)
+                            .background(Color.blue)
+                            .clipShape(RoundedRectangle(cornerRadius: 10))
+                    }
+                    .buttonStyle(.plain)
                 }
+                .padding(.horizontal)
+                .padding(.top, 12)
+                .padding(.bottom, 8)
+                .background(Color(.systemBackground))
                 
-                Spacer()
+                VStack(alignment: .leading, spacing: 16) {
+                    
+                    Text("Notebooks")
+                        .font(.largeTitle)
+                        .bold()
+                        .padding(.top)
+                    
+                    if isLoading {
+                        ProgressView()
+                            .padding(.top, 20)
+                    }
+                    else if notebooks.isEmpty {
+                        Text("No notebooks created yet.")
+                            .foregroundStyle(.secondary)
+                            .padding(.top, 20)
+                    }
+                    else {
+                        ForEach(notebooks) { notebook in
+                            NavigationLink {
+                                NotesListView(notebook: notebook)
+                            } label: {
+                                HStack(spacing: 12) {
+                                    
+                                    Image(systemName: "text.book.closed")
+                                        .font(.system(size: 22))
+                                        .foregroundStyle(colorForNotebook(notebook))
+                                    
+                                    Text(notebook.title)
+                                        .font(.system(size: 18, weight: .semibold))
+                                    
+                                    Spacer()
+                                }
+                                .padding(.vertical, 10)
+                            }
+                            .buttonStyle(.plain)
+                            .simultaneousGesture(
+                                  TapGesture().onEnded {
+                                      lightHaptic()
+                                  }
+                              )
+                        }
+                    }
+                    
+                    Spacer()
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding()
             }
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .padding()
-        }
-        .onAppear {
-            fetchNotebooks()
-        }
-        .sheet(isPresented: $showCreateNotebook) {
-            CreateNotebookView {
+            .onAppear {
                 fetchNotebooks()
             }
-            .presentationDetents([.medium])
-            .presentationDragIndicator(.visible)
+            .sheet(isPresented: $showCreateNotebook) {
+                CreateNotebookView {
+                    fetchNotebooks()
+                }
+                .presentationDetents([.medium])
+                .presentationDragIndicator(.visible)
+            }
         }
     }
-    
-    // MARK: - Color Helper
     
     private func colorForNotebook(_ notebook: Notebook) -> Color {
         if notebook.color.isEmpty {
@@ -108,8 +116,6 @@ struct HomeView: View {
         }
         return Color(hex: notebook.color)
     }
-    
-    // MARK: - Fetch
     
     private func fetchNotebooks() {
         isLoading = true
@@ -130,8 +136,6 @@ struct HomeView: View {
             }
         }
     }
-    
-    // MARK: - Haptic
     
     private func lightHaptic() {
         let generator = UIImpactFeedbackGenerator(style: .light)

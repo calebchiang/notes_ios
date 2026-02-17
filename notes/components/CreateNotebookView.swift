@@ -102,10 +102,10 @@ struct CreateNotebookView: View {
                             Circle()
                                 .stroke(isCustomSelected ? Color.primary : Color.clear, lineWidth: 2)
                         )
-                        .onChange(of: customColor) { newColor in
-                            selectedColorHex = newColor.toHex()
-                            isCustomSelected = true
-                        }
+                        .onChange(of: customColor) { _, newColor in
+                               selectedColorHex = newColor.toHex()
+                               isCustomSelected = true
+                           }
                 }
             }
             

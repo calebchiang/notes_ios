@@ -8,7 +8,8 @@ struct NoteView: View {
     
     @Environment(\.dismiss) private var dismiss
     @FocusState private var focusedField: Field?
-    
+    @State private var isContentFocused: Bool = false
+
     enum Field {
         case title
         case content
@@ -54,10 +55,16 @@ struct NoteView: View {
                     }
                     .buttonStyle(.plain)
                     
-                    if focusedField != nil {
+                    if focusedField != nil || isContentFocused {
                         Button {
                             lightHaptic()
-                            focusedField = nil
+                            if focusedField == .title {
+                                focusedField = nil
+                            }
+
+                            if isContentFocused {
+                                isContentFocused = false
+                            }
                         } label: {
                             Image(systemName: "checkmark")
                                 .font(.system(size: 14, weight: .bold))
@@ -80,8 +87,10 @@ struct NoteView: View {
                         )
                     }
                 }
-                .animation(.spring(response: 0.3, dampingFraction: 0.8), value: focusedField != nil)
-
+                .animation(
+                    .spring(response: 0.3, dampingFraction: 0.8),
+                    value: focusedField != nil || isContentFocused
+                )
             }
             .padding(.horizontal)
             .padding(.top, 12)
@@ -106,10 +115,12 @@ struct NoteView: View {
                         scheduleTitleAutoSave()
                     }
 
-                TextEditor(text: $content)
+                RichTextEditor(
+                    isFocused: $isContentFocused,
+                    text: $content
+                )
                     .font(.body)
                     .frame(minHeight: 200)
-                    .focused($focusedField, equals: .content)
                     .onChange(of: content) { _, newValue in
                         scheduleContentAutoSave()
                     }

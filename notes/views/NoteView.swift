@@ -8,8 +8,11 @@ struct NoteView: View {
     
     @Environment(\.dismiss) private var dismiss
     @FocusState private var focusedField: Field?
+    
     @State private var isContentFocused: Bool = false
-
+    @State private var showAiSheet: Bool = false
+    @State private var showAiChat = false
+    
     enum Field {
         case title
         case content
@@ -23,8 +26,10 @@ struct NoteView: View {
     @State private var contentDebounceWorkItem: DispatchWorkItem?
     
     var body: some View {
+        
         VStack(spacing: 0) {
             
+            // MARK: Top Bar
             HStack {
                 
                 Button(action: {
@@ -32,44 +37,56 @@ struct NoteView: View {
                     dismiss()
                 }) {
                     Image(systemName: "chevron.left")
-                        .font(.title2)
+                        .font(.system(size: 22, weight: .semibold))
                         .foregroundStyle(.primary)
+                        .frame(width: 36, height: 36)
                 }
                 .buttonStyle(.plain)
                 
                 Spacer()
                 
-                HStack(spacing: 8) {
+                HStack(spacing: 12) {
                     
+                    // AI Button
                     Button(action: {
                         lightHaptic()
+                        showAiSheet = true
                     }) {
-                        Image(systemName: "sparkles")
-                            .font(.system(size: 14, weight: .semibold))
-                            .foregroundStyle(.primary)
-                            .frame(width: 30, height: 30)
-                            .background(
-                                Circle()
-                                    .fill(Color.purple.opacity(0.2))
-                            )
+                        HStack(spacing: 6) {
+                            Image(systemName: "sparkles")
+                                .font(.system(size: 15, weight: .semibold))
+                            
+                            Text("AI")
+                                .font(.system(size: 14, weight: .semibold))
+                        }
+                        .foregroundStyle(.primary)
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, 8)
+                        .background(
+                            RoundedRectangle(cornerRadius: 10)
+                                .fill(Color.secondary.opacity(0.15))
+                        )
                     }
                     .buttonStyle(.plain)
                     
+                    // Blue Check
                     if focusedField != nil || isContentFocused {
                         Button {
                             lightHaptic()
+                            
                             if focusedField == .title {
                                 focusedField = nil
                             }
-
+                            
                             if isContentFocused {
                                 isContentFocused = false
                             }
+                            
                         } label: {
                             Image(systemName: "checkmark")
-                                .font(.system(size: 14, weight: .bold))
+                                .font(.system(size: 16, weight: .bold))
                                 .foregroundStyle(.white)
-                                .frame(width: 28, height: 28)
+                                .frame(width: 34, height: 34)
                                 .background(
                                     title.trimmingCharacters(in: .whitespaces).isEmpty
                                     ? Color.gray
@@ -97,41 +114,76 @@ struct NoteView: View {
             .padding(.bottom, 8)
             .background(Color(.systemBackground))
             
+            
+            // MARK: Content
+            
             VStack(alignment: .leading, spacing: 16) {
                 
                 TextField("Title", text: $title, axis: .vertical)
                     .font(.title.bold())
                     .focused($focusedField, equals: .title)
                     .lineLimit(1...3)
-                    .submitLabel(.next)
-                    .onSubmit {
-                        focusedField = .content
-                    }
                     .onChange(of: title) { oldValue, newValue in
+                        
                         if newValue.contains("\n") {
                             title = newValue.replacingOccurrences(of: "\n", with: "")
-                            focusedField = .content
+                            focusedField = nil
+                            
+                            DispatchQueue.main.async {
+                                isContentFocused = true
+                            }
+                            return
                         }
+                        
                         scheduleTitleAutoSave()
                     }
-
+                
                 RichTextEditor(
                     isFocused: $isContentFocused,
                     text: $content
                 )
-                    .font(.body)
-                    .frame(minHeight: 200)
-                    .onChange(of: content) { _, newValue in
-                        scheduleContentAutoSave()
-                    }
-
+                .font(.body)
+                .frame(minHeight: 200)
+                .onChange(of: content) { _, _ in
+                    scheduleContentAutoSave()
+                }
+                
                 Spacer()
             }
             .padding()
         }
+        .safeAreaInset(edge: .bottom) {
+            HStack {
+                Spacer()
+                
+                Button {
+                    lightHaptic()
+                    showAiChat = true
+                } label: {
+                    Image(systemName: "bubble.left.and.bubble.right")
+                        .font(.system(size: 22, weight: .semibold))
+                        .foregroundStyle(.primary)
+                        .frame(width: 60, height: 60)
+                        .background(
+                            Circle()
+                                .fill(Color.secondary.opacity(0.15))
+                        )
+                }
+                .buttonStyle(.plain)
+                .padding(.trailing, 20)
+                .padding(.bottom, 10)
+            }
+        }
+        .fullScreenCover(isPresented: $showAiSheet) {
+            AiFeaturesView()
+        }
+        .fullScreenCover(isPresented: $showAiChat) {
+            AiChatView()
+        }
         .navigationBarBackButtonHidden(true)
         .navigationBarHidden(true)
         .onAppear {
+            
             if let existingNote {
                 currentNote = existingNote
                 title = existingNote.title
@@ -145,6 +197,9 @@ struct NoteView: View {
             }
         }
     }
+    
+    
+    // MARK: Auto Save
     
     private func scheduleTitleAutoSave() {
         titleDebounceWorkItem?.cancel()
@@ -165,7 +220,6 @@ struct NoteView: View {
     
     private func scheduleContentAutoSave() {
         contentDebounceWorkItem?.cancel()
-        
         guard currentNote != nil else { return }
         
         let workItem = DispatchWorkItem {
@@ -175,6 +229,9 @@ struct NoteView: View {
         contentDebounceWorkItem = workItem
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.0, execute: workItem)
     }
+    
+    
+    // MARK: Network
     
     private func createNote() {
         isLoading = true
@@ -216,7 +273,7 @@ struct NoteView: View {
     
     private func updateNote() {
         guard let note = currentNote else { return }
-
+        
         isLoading = true
         
         let body: [String: Any] = [
@@ -241,10 +298,10 @@ struct NoteView: View {
             }
         }
     }
-
+    
+    
     private func lightHaptic() {
         let generator = UIImpactFeedbackGenerator(style: .light)
         generator.impactOccurred()
     }
 }
-

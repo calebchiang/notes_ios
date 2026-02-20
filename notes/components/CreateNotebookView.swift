@@ -1,10 +1,3 @@
-//
-//  CreateNotebookView.swift
-//  notes
-//
-//  Created by Caleb Chiang on 2026-02-16.
-//
-
 import SwiftUI
 
 struct CreateNotebookView: View {
@@ -18,6 +11,11 @@ struct CreateNotebookView: View {
     @State private var isLoading: Bool = false
     @State private var errorMessage: String?
     
+    @State private var selectedCategory: String = "School"
+    @State private var customCategory: String = ""
+    
+    private let categories = ["School", "Work", "Personal", "Other"]
+    
     private let colorOptions: [String] = [
         "#3B82F6",
         "#EF4444",
@@ -30,7 +28,6 @@ struct CreateNotebookView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 20) {
             
-            // Top right X
             HStack {
                 Spacer()
                 Button(action: { dismiss() }) {
@@ -65,16 +62,50 @@ struct CreateNotebookView: View {
                             .stroke(Color(.systemGray4), lineWidth: 1)
                     )
             }
+            
+            VStack(alignment: .leading, spacing: 10) {
+                Text("Category")
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+                
+                HStack(spacing: 10) {
+                    ForEach(categories, id: \.self) { category in
+                        Text(category)
+                            .font(.subheadline)
+                            .padding(.vertical, 8)
+                            .padding(.horizontal, 14)
+                            .background(
+                                RoundedRectangle(cornerRadius: 20)
+                                    .fill(selectedCategory == category ? Color.blue : Color(.systemGray6))
+                            )
+                            .foregroundStyle(selectedCategory == category ? .white : .primary)
+                            .onTapGesture {
+                                selectedCategory = category
+                            }
+                    }
+                }
+                
+                if selectedCategory == "Other" {
+                    TextField("Enter custom category", text: $customCategory)
+                        .textInputAutocapitalization(.words)
+                        .padding(14)
+                        .background(
+                            RoundedRectangle(cornerRadius: 12)
+                                .fill(Color(.systemGray6))
+                        )
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 12)
+                                .stroke(Color(.systemGray4), lineWidth: 1)
+                        )
+                }
+            }
 
-            // Color Selection
             VStack(alignment: .leading, spacing: 10) {
                 Text("Color")
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
                 
                 HStack(spacing: 16) {
-                    
-                    // Preset Colors
                     ForEach(colorOptions, id: \.self) { hex in
                         Circle()
                             .fill(Color(hex: hex))
@@ -92,7 +123,6 @@ struct CreateNotebookView: View {
                             }
                     }
                     
-                    // Direct ColorPicker Circle
                     ColorPicker("", selection: $customColor, supportsOpacity: false)
                         .labelsHidden()
                         .frame(width: 30, height: 30)
@@ -103,9 +133,9 @@ struct CreateNotebookView: View {
                                 .stroke(isCustomSelected ? Color.primary : Color.clear, lineWidth: 2)
                         )
                         .onChange(of: customColor) { _, newColor in
-                               selectedColorHex = newColor.toHex()
-                               isCustomSelected = true
-                           }
+                            selectedColorHex = newColor.toHex()
+                            isCustomSelected = true
+                        }
                 }
             }
             
@@ -145,9 +175,14 @@ struct CreateNotebookView: View {
         isLoading = true
         errorMessage = nil
         
+        let finalCategory = selectedCategory == "Other"
+            ? customCategory.trimmingCharacters(in: .whitespacesAndNewlines)
+            : selectedCategory
+        
         let body: [String: Any] = [
             "title": title,
-            "color": selectedColorHex
+            "color": selectedColorHex,
+            "category": finalCategory
         ]
         
         RequestManager.shared.sendRequest(
@@ -176,4 +211,3 @@ struct CreateNotebookView: View {
         generator.impactOccurred()
     }
 }
-

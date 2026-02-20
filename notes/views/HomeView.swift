@@ -66,29 +66,59 @@ struct HomeView: View {
                             .padding(.top, 20)
                     }
                     else {
-                        ForEach(notebooks) { notebook in
+                        ForEach(Array(notebooks.enumerated()), id: \.element.id) { index, notebook in
+                            
                             NavigationLink {
                                 NotesListView(notebook: notebook)
                             } label: {
-                                HStack(spacing: 12) {
+                                
+                                HStack(alignment: .center, spacing: 12) {
                                     
                                     Image(systemName: "text.book.closed")
-                                        .font(.system(size: 22))
+                                        .font(.system(size: 25))
                                         .foregroundStyle(colorForNotebook(notebook))
+                                        .frame(width: 28)
                                     
-                                    Text(notebook.title)
-                                        .font(.system(size: 18, weight: .semibold))
+                                    VStack(alignment: .leading, spacing: 6) {
+                                        
+                                        Text(notebook.title)
+                                            .font(.system(size: 18, weight: .semibold))
+                                        
+                                        if let category = notebook.category,
+                                           !category.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                                            
+                                            Text(category)
+                                                .font(.caption.weight(.medium))
+                                                .foregroundStyle(.primary)
+                                                .padding(.horizontal, 10)
+                                                .padding(.vertical, 4)
+                                                .background(
+                                                    RoundedRectangle(cornerRadius: 20)
+                                                        .fill(Color.blue.opacity(0.30))
+                                                )
+                                                .overlay(
+                                                    RoundedRectangle(cornerRadius: 20)
+                                                        .stroke(Color.blue.opacity(0.7), lineWidth: 1)
+                                                )
+                                        }
+                                    }
                                     
                                     Spacer()
                                 }
-                                .padding(.vertical, 10)
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                                .contentShape(Rectangle())
+                                .padding(.vertical, 12)
                             }
                             .buttonStyle(.plain)
                             .simultaneousGesture(
-                                  TapGesture().onEnded {
-                                      lightHaptic()
-                                  }
-                              )
+                                TapGesture().onEnded {
+                                    lightHaptic()
+                                }
+                            )
+                            
+                            if index < notebooks.count - 1 {
+                                Divider()
+                            }
                         }
                     }
                     
@@ -147,4 +177,3 @@ struct HomeView: View {
     HomeView()
         .environmentObject(AuthViewModel())
 }
-

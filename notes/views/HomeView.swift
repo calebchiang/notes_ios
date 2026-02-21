@@ -93,12 +93,12 @@ struct HomeView: View {
                                                 .padding(.horizontal, 10)
                                                 .padding(.vertical, 4)
                                                 .background(
-                                                    RoundedRectangle(cornerRadius: 20)
-                                                        .fill(Color.blue.opacity(0.30))
+                                                    RoundedRectangle(cornerRadius: 30)
+                                                        .fill(Color.blue.opacity(0.25))
                                                 )
                                                 .overlay(
-                                                    RoundedRectangle(cornerRadius: 20)
-                                                        .stroke(Color.blue.opacity(0.7), lineWidth: 1)
+                                                    RoundedRectangle(cornerRadius: 30)
+                                                        .stroke(Color.blue.opacity(0.6), lineWidth: 1)
                                                 )
                                         }
                                     }

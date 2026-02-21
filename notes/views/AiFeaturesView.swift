@@ -10,6 +10,7 @@ import SwiftUI
 struct AiFeaturesView: View {
     
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.colorScheme) private var colorScheme
     
     var body: some View {
         ZStack {
@@ -19,7 +20,6 @@ struct AiFeaturesView: View {
             ScrollView {
                 VStack(alignment: .leading, spacing: 20) {
                     
-                    // Top Bar
                     HStack {
                         Button {
                             dismiss()
@@ -40,16 +40,11 @@ struct AiFeaturesView: View {
                     .padding(.horizontal)
                     .padding(.top, 12)
                     
-                    
-                    // MARK: Generate Smart Notes
-                    
                     Text("Generate Smart Notes")
                         .font(.title2.weight(.semibold))
                         .foregroundStyle(.primary)
                         .padding(.horizontal)
                     
-                    
-                    // YouTube Card
                     VStack(alignment: .leading, spacing: 12) {
                         
                         HStack(spacing: 12) {
@@ -74,12 +69,14 @@ struct AiFeaturesView: View {
                     .padding(18)
                     .background(
                         RoundedRectangle(cornerRadius: 16)
-                            .fill(Color.red.opacity(0.06))
+                            .fill(
+                                colorScheme == .dark
+                                ? Color.red.opacity(0.18)
+                                : Color.red.opacity(0.08)
+                            )
                     )
                     .padding(.horizontal)
                     
-                    
-                    // Record Audio Card (reduced spacing above)
                     VStack(alignment: .leading, spacing: 12) {
                         
                         HStack(spacing: 12) {
@@ -104,12 +101,13 @@ struct AiFeaturesView: View {
                     .padding(18)
                     .background(
                         RoundedRectangle(cornerRadius: 16)
-                            .fill(Color.orange.opacity(0.06))
+                            .fill(
+                                colorScheme == .dark
+                                ? Color.orange.opacity(0.18)
+                                : Color.orange.opacity(0.08)
+                            )
                     )
                     .padding(.horizontal)
-                    
-                    
-                    // MARK: Practice Section
                     
                     Text("Practice")
                         .font(.title2.weight(.semibold))
@@ -117,8 +115,6 @@ struct AiFeaturesView: View {
                         .padding(.horizontal)
                         .padding(.top, 8)
                     
-                    
-                    // Flashcards Card
                     VStack(alignment: .leading, spacing: 12) {
                         
                         HStack(spacing: 12) {
@@ -143,12 +139,14 @@ struct AiFeaturesView: View {
                     .padding(18)
                     .background(
                         RoundedRectangle(cornerRadius: 16)
-                            .fill(Color.blue.opacity(0.06))
+                            .fill(
+                                colorScheme == .dark
+                                ? Color.blue.opacity(0.18)
+                                : Color.blue.opacity(0.08)
+                            )
                     )
                     .padding(.horizontal)
                     
-                    
-                    // Practice Quiz Card (reduced spacing above)
                     VStack(alignment: .leading, spacing: 12) {
                         
                         HStack(spacing: 12) {
@@ -173,10 +171,13 @@ struct AiFeaturesView: View {
                     .padding(18)
                     .background(
                         RoundedRectangle(cornerRadius: 16)
-                            .fill(Color.green.opacity(0.06))
+                            .fill(
+                                colorScheme == .dark
+                                ? Color.green.opacity(0.18)
+                                : Color.green.opacity(0.08)
+                            )
                     )
                     .padding(.horizontal)
-                    
                     
                     Spacer(minLength: 40)
                 }
